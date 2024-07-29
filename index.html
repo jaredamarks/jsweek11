@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+ <!-- CSS -->
+  <style>
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+      margin: 20px auto;
+    }
+    .cell {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid #000;
+      font-size: 3em;
+      cursor: pointer;
+    }
+    .alert {
+      display: none;
+    }
+  </style>
+  <!-- ENDS CSS -->
+</head>
+<body>
+<!-- Container holding the game heading, the turn indicator, the grid for the game, the restart button, and an alert for announcing the game result. -->
+<div class="container text-center">
+  <h1>Tic-Tac-Toe</h1>
+  <h2 id="turn">X's Turn</h2>
+  <div id="game" class="grid"></div>
+  <button id="restart" class="btn btn-primary mt-3">Restart</button>
+  <div id="alert" class="alert alert-success mt-3" role="alert"></div>
+</div>
+
+<script>
+//  variable declarations and initialization statements
+  const gameElement = document.getElementById('game');
+  const turnElement = document.getElementById('turn');
+  const alertElement = document.getElementById('alert');
+  const restartButton = document.getElementById('restart');
+  
+//   Initialization turn declaration
+  let currentTurn = 'X';
+  let board = ['', '', '', '', '', '', '', '', ''];
+
+
+  function createGrid() {
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.dataset.index = i;
+      cell.addEventListener('click', handleCellClick);
+      gameElement.appendChild(cell);
+    }
+  }
+
+  function handleCellClick(event) {
+    const cell = event.target;
+    const index = cell.dataset.index;
+
+    if (board[index] === '' && !isGameOver()) {
+      board[index] = currentTurn;
+      cell.textContent = currentTurn;
+      if (checkWinner()) {
+        alertElement.textContent = `${currentTurn} Wins!`;
+        alertElement.classList.remove('alert-success');
+        alertElement.classList.add('alert-danger');
+        alertElement.style.display = 'block';
+      } else if (board.every(cell => cell !== '')) {
+        alertElement.textContent = 'Draw!';
+        alertElement.classList.remove('alert-danger');
+        alertElement.classList.add('alert-success');
+        alertElement.style.display = 'block';
+      } else {
+        currentTurn = currentTurn === 'X' ? 'O' : 'X';
+        turnElement.textContent = `${currentTurn}'s Turn`;
+      }
+    }
+  }
+// Check for a winner function declaration with array of winningCombos
+  function checkWinner() {
+    const winningCombos = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+// return statement w/ array methods & arrow function // returns winner
+    return winningCombos.some(combo => 
+      combo.every(index => board[index] === currentTurn)
+    );
+  }
+// Game over function
+  function isGameOver() {
+    return alertElement.style.display === 'block';
+  }
+// Resets Game function
+  function resetGame() {
+    board = ['', '', '', '', '', '', '', '', ''];
+    currentTurn = 'X';
+    turnElement.textContent = `${currentTurn}'s Turn`;
+    alertElement.style.display = 'none';
+    Array.from(gameElement.children).forEach(cell => {
+      cell.textContent = '';
+    });
+  }
+// Restart button
+  restartButton.addEventListener('click', resetGame);
+// Creates grid
+  createGrid();
+</script>
+
+</body>
+</html>
